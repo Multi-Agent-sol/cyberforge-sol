@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyberforge Terminal - Dominating AI</title>
+    <style>
+        :root {
+          --neon-orange: #ff3300;
+          --neon-bright: #ff5050;
+          --terminal-bg: #000;
+          --font-terminal: 'Consolas', 'Monaco', monospace;
+          --danger-red: #ff0033;
+        }
+        
+        body {
+          margin: 0;
+          padding: 0;
+          background: var(--terminal-bg);
+          color: var(--neon-orange);
+          font-family: var(--font-terminal);
+          min-height: 100vh;
+          overflow: hidden;
+        }
+        
+        .terminal-container {
+          position: relative;
+          width: 100%;
+          height: 100vh;
+          padding: 20px;
+          box-sizing: border-box;
+        }
+        
+        .scanline {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 2px;
+          background: var(--neon-orange);
+          opacity: 0.3;
+          pointer-events: none;
+          animation: scanline 6s linear infinite;
+        }
+        
+        .grid-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(transparent 0%, rgba(255,140,0,0.05) 50%, transparent 100%);
+          background-size: 100% 4px;
+          pointer-events: none;
+        }
+        
+        .terminal-output {
+          margin-bottom: 20px;
+          white-space: pre-wrap;
+          text-shadow: 0 0 5px rgba(255,140,0,0.5);
+        }
+        
+        .command-line {
+          display: flex;
+          align-items: center;
+          margin-top: 10px;
+        }
+        
+        .prompt {
+          color: var(--neon-bright);
+          margin-right: 10px;
+          text-shadow: 0 0 5px rgba(255,165,0,0.5);
+        }
+        
+        .command-input {
+          background: transparent;
+          border: none;
+          color: var(--neon-orange);
+          font-family: var(--font-terminal);
+          font-size: 16px;
+          width: 100%;
+          outline: none;
+          text-shadow: 0 0 5px rgba(255,140,0,0.5);
+        }
+        
+        .typing {
+          animation: typing 0.05s steps(1);
+        }
+        
+        .glitch {
+          animation: glitch 0.3s ease-in-out;
+        }
+        
+        .system-crash {
+          animation: none;
+        }
+        
+        .terminal-text-crash {
+          animation: textCrash 0.3s ease-in-out;
+          display: inline-block;
+        }
+        
+        @keyframes systemCrash {
+          0% { transform: translate(0); filter: none; }
+          20% { transform: translate(-5px, 5px); filter: hue-rotate(-45deg) saturate(150%); }
+          40% { transform: translate(5px, -5px); filter: hue-rotate(45deg) saturate(250%); color: var(--danger-red); }
+          60% { transform: translate(-5px, 5px); filter: hue-rotate(-45deg) saturate(150%); }
+          80% { transform: translate(5px, -5px); filter: hue-rotate(45deg) saturate(250%); color: var(--danger-red); }
+          100% { transform: translate(0); filter: none; }
+        }
+        
+        @keyframes scanline {
+          0% { transform: translateY(0); }
+          100% { transform: translateY(100vh); }
+        }
+        
+        @keyframes typing {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0; }
+        }
+        
+        @keyframes glitch {
+          0% { transform: skew(0deg); }
+          20% { transform: skew(-3deg); filter: hue-rotate(-45deg); }
+          40% { transform: skew(3deg); filter: hue-rotate(45deg); }
+          60% { transform: skew(-3deg); filter: hue-rotate(-45deg); }
+          80% { transform: skew(3deg); filter: hue-rotate(45deg); }
+          100% { transform: skew(0deg); filter: none; }
+        }
+        
+        .loading {
+          display: inline-block;
+          overflow: hidden;
+          animation: loading 1s infinite;
+        }
+        
+        @keyframes loading {
+          0% { content: '.'; }
+          33% { content: '..'; }
+          66% { content: '...'; }
+        }
+        
+        .ascii-art {
+          font-family: monospace;
+          white-space: pre;
+          color: var(--neon-bright);
+          margin: 10px 0;
+          text-shadow: 0 0 5px rgba(255,165,0,0.5);
+        }
+        
+        .danger {
+          color: var(--danger-red);
+          text-shadow: 0 0 5px rgba(255,0,51,0.5);
+        }
+        
+        @keyframes textCrash {
+          0% { 
+            transform: translate(0);
+            opacity: 1;
+          }
+          20% { 
+            transform: translate(2px, -2px);
+            color: var(--danger-red);
+            opacity: 0.8;
+          }
+          40% { 
+            transform: translate(-2px, 2px);
+            color: var(--neon-orange);
+            opacity: 0.9;
+          }
+          60% { 
+            transform: translate(1px, -1px);
+            color: var(--danger-red);
+            opacity: 0.7;
+          }
+          80% { 
+            transform: translate(-1px, 1px);
+            color: var(--neon-bright);
+            opacity: 0.8;
+          }
+          100% { 
+            transform: translate(0);
+            opacity: 1;
+          }
+        }
+        
+        .char-glitch {
+          display: inline-block;
+          animation: charGlitch 0.2s ease-in-out;
+        }
+        
+        @keyframes charGlitch {
+          0% { transform: translate(0); }
+          25% { 
+            transform: translate(2px, -1px);
+            color: var(--danger-red);
+          }
+          50% { 
+            transform: translate(-1px, 1px);
+            color: var(--neon-bright);
+          }
+          75% { 
+            transform: translate(1px, -2px);
+            color: var(--danger-red);
+          }
+          100% { transform: translate(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="scanline"></div>
+    <div class="grid-overlay"></div>
+    <div class="terminal-container">
+      <div id="output" class="terminal-output"></div>
+      <div class="command-line">
+        <span class="prompt">cyberforge@terminal:~$</span>
+        <input type="text" class="command-input" id="commandInput" autocomplete="off" spellcheck="false">
+      </div>
+    </div>
+
+    <script>
+    const asciiArts = {
+      warning: `
+        ██╗    ██╗ █████╗ ██████╗ ███╗   ██╗██╗███╗   ██╗ ██████╗ 
+        ██║    ██║██╔══██╗██╔══██╗████╗  ██║██║████╗  ██║██║  ███╗
+        ██║ █╗ ██║███████║██████╔╝██╔██╗ ██║██║██╔██╗ ██║██║  ███╗
+        ██║███╗██║██╔══██║██╔══██╗██║╚██╗██║██║██║╚██╗██║██║   ██║
+        ╚███╔███╔╝██║  ██║██║  ██║██║ ╚████║██║██║ ╚████║╚██████╔╝
+         ╚══╝╚══╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝╚═╝  ╚═══╝ ╚═════╝ 
+      `,
+      skull: `
+         ▄▄▄▄▄▄▄   ▄ ▄▄ ▄▄▄▄▄▄▄    
+         █ ▄▄▄ █ ▀ █ ██ █ ▄▄▄ █    
+         █ ███ █ ▀▀█▄█  █ ███ █    
+         █▄▄▄▄▄█ █ ▀ █ ▄█▄▄▄▄▄█    
+         ▄▄ ▄  ▄▄█▀█▄█▄▄  ▄▄▄ ▄    
+         ▄▀█▀█▄██▄ ▀▄█ ▄▄▄▄▀▄█▄    
+         ▄▄▄▄▄▄▄ █▄▀ ▄▄ █▄█▄ ▄     
+         █ ▄▄▄ █  ▄▄█▄█▄▄▀ █▄█     
+         █ ███ █ ▄▀▄ ▄▄▄ ▀▀▄▄█     
+         █▄▄▄▄▄█ █ ▀ ▄ █ ▄  █      
+      `,
+      system: `
+       ______      __             ______                    
+      / ____/_  __/ /_  ___  ____/ ____/___  ________  ___ 
+     / /   / / / / __ \\/ _ \\/ __  /_  / __ \\/ ___/ _ \\/ _ \\
+    / /___/ /_/ / /_/ /  __/ /_/ __/ / /_/ / /  /  __/  __/
+    \\____/\\__, /_.___/\\___/\\__/_/    \\____/_/  /\\___/\\___/ 
+         /____/                                             
+      `
+    };
+
+    const commands = {
+      'help': 'Available commands:\nhelp - Show this help\nclear - Clear terminal\nlogin - Access secure system\nstatus - Display system status\nlaunch - Initiate launch sequence\nping - Test network connection\nscan - Scan for vulnerabilities',
+      'clear': '',
+      'login': 'Initiating secure login protocol...\nValidating credentials...\nAccess granted.',
+      'status': 'SYSTEM STATUS: OPERATIONAL\nSECURITY LEVEL: MAXIMUM\nFIREWALL: ACTIVE\nENCRYPTION: QUANTUM\nTHREAT LEVEL: LOW',
+      'launch': 'WARNING: Launch sequence requires level 3 authorization\nInitiating security protocols...',
+      'ping': 'Pinging system nodes...\nResponse time: 23ms\nNetwork status: OPTIMAL',
+      'scan': 'Initiating system scan...\nAnalyzing vulnerabilities...\nNo critical vulnerabilities detected.'
+    };
+
+    const terminalOutput = document.getElementById('output');
+    const commandInput = document.getElementById('commandInput');
+
+    let unlockedCommands = ['help', 'clear', 'login'];
+    let commandHistory = [];
+    let historyIndex = -1;
+
+    async function typeText(text, element) {
+      const chars = text.split('');
+      for (let char of chars) {
+        element.textContent += char;
+        await new Promise(resolve => setTimeout(resolve, 30 + Math.random() * 50));
+      }
+    }
+
+    function createResponseElement() {
+      const response = document.createElement('div');
+      response.classList.add('typing');
+      terminalOutput.appendChild(response);
+      return response;
+    }
+
+    function showAsciiArt(type) {
+      const artElement = document.createElement('div');
+      artElement.classList.add('ascii-art');
+      artElement.textContent = asciiArts[type];
+      terminalOutput.appendChild(artElement);
+    }
+
+    function triggerSystemCrash() {
+      document.body.classList.add('system-crash');
+      setTimeout(() => {
+        document.body.classList.remove('system-crash');
+      }, 500);
+    }
+
+    function glitchText(text) {
+      const container = document.createElement('div');
+      text.split('').forEach(char => {
+        const span = document.createElement('span');
+        span.textContent = char;
+        span.classList.add('char-glitch');
+        span.style.animationDelay = `${Math.random() * 0.5}s`;
+        container.appendChild(span);
+      });
+      return container;
+    }
+
+    async function processCommand(command) {
+      const response = createResponseElement();
+      
+      if (command === 'clear') {
+        terminalOutput.innerHTML = '';
+        return;
+      }
+      
+      if (!commands[command]) {
+        response.classList.add('terminal-text-crash');
+        await typeText(`Command not recognized: ${command}`, response);
+        showAsciiArt('skull');
+        return;
+      }
+      
+      if (!unlockedCommands.includes(command)) {
+        response.classList.add('terminal-text-crash');
+        response.classList.add('danger');
+        await typeText('Access denied: Insufficient privileges.', response);
+        showAsciiArt('warning');
+        return;
+      }
+      
+      if (command === 'login') {
+        unlockedCommands = [...unlockedCommands, 'status', 'ping', 'scan'];
+        showAsciiArt('system');
+      }
+      
+      response.classList.add('terminal-text-crash');
+      await typeText(commands[command], response);
+      
+      if (command === 'scan') {
+        unlockedCommands.push('launch');
+        const unlockMsg = createResponseElement();
+        unlockMsg.classList.add('terminal-text-crash');
+        await typeText('\nNEW ACCESS GRANTED: Launch sequence now available', unlockMsg);
+      }
+      
+      if (command === 'launch') {
+        showAsciiArt('warning');
+      }
+    }
+
+    commandInput.addEventListener('keydown', async function(e) {
+      if (e.key === 'Enter') {
+        const command = this.value.toLowerCase().trim();
+        if (command) {
+          commandHistory.push(command);
+          historyIndex = commandHistory.length;
+          await processCommand(command);
+          this.value = '';
+        }
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (historyIndex > 0) {
+          historyIndex--;
+          this.value = commandHistory[historyIndex];
+        }
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (historyIndex < commandHistory.length - 1) {
+          historyIndex++;
+          this.value = commandHistory[historyIndex];
+        } else {
+          historyIndex = commandHistory.length;
+          this.value = '';
+        }
+      }
+    });
+
+    window.onload = async function() {
+      const greeting = createResponseElement();
+      greeting.classList.add('terminal-text-crash');
+      await typeText('CyberForge Terminal v2.0\nCLASSIFICATION: TOP SECRET\nType "help" for available commands.', greeting);
+      showAsciiArt('system');
+    };
+    </script>
+</body>
+</html>
